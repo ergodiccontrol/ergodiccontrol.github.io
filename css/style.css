@@ -1,0 +1,71 @@
+html {
+  font-size: 125%;
+}
+
+header {
+	padding: 154px 0 100px;
+}
+
+section {
+	padding: 150px 0;
+}
+
+body {
+	font-family: 'Lato', sans-serif;
+	text-align: justify;
+}
+
+h2 {
+	font-family: 'Slabo', sans-serif;
+    font-weight: normal;
+    font-style: normal;
+	font-size: 38px;
+}
+
+a { 
+	color: #F4F4F2; 
+	text-decoration: none;
+} 
+
+a:hover { 
+	color: #E8E8E8; 
+} 
+
+/*
+BBBFCA
+
+.autohide {
+	position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1030;
+}
+.scrolled-down {
+	transform:translateY(-100%); transition: all 0.3s ease-in-out;
+}
+.scrolled-up {
+	transform:translateY(0); transition: all 0.3s ease-in-out;
+}
+*/
+	
+.mybg-menu {
+    background-color: #495464;
+    color: #F4F4F2;
+}
+
+.mybg-light {
+    background-color: #F4F4F2;
+}
+
+.mybg-dark {
+    background-color: #E8E8E8;
+}
+
+.mybg-verydark {
+    background-color: #495464;
+    color: #F4F4F2;
+}
+
+

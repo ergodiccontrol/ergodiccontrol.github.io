@@ -7,32 +7,33 @@ header {
 }
 
 section {
-	padding: 150px 0;
+	padding: 100px 0;
 }
 
 body {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Ledger', sans-serif;
 	text-align: justify;
 }
 
 h2 {
-	font-family: 'Slabo', sans-serif;
-    font-weight: normal;
+	font-family: 'Nixie One', sans-serif;
+    font-weight: bold;
     font-style: normal;
 	font-size: 38px;
+	padding: 0 0 30px 0;
 }
 
 a { 
-	color: #F4F4F2; 
+	color: #1B7E0C; 
 	text-decoration: none;
 } 
 
 a:hover { 
-	color: #E8E8E8; 
+	color: #29BF12; 
 } 
 
 /*
-BBBFCA
+https://coolors.co/29bf12-abff4f-08bdbd-f21b3f-ff9914
 
 .autohide {
 	position: fixed;
@@ -50,9 +51,10 @@ BBBFCA
 }
 */
 	
-.mybg-menu {
-    background-color: #495464;
-    color: #F4F4F2;
+.mybg-header {
+    background-color: #08BDBD;
+    font-family: 'Nixie One', sans-serif;
+    font-weight: bold;
 }
 
 .mybg-light {
@@ -63,9 +65,14 @@ BBBFCA
     background-color: #E8E8E8;
 }
 
-.mybg-verydark {
-    background-color: #495464;
-    color: #F4F4F2;
+.mybg-schedule {
+	font-family: 'Roboto Mono', sans-serif;
+}
+
+.mybg-footer {
+    background-color: #F21B3F;
+    font-family: 'Nixie One', sans-serif;
+    font-weight: bold;
 }
 
 

@@ -91,7 +91,7 @@ def controlCommand(x, mu):
 <py-repl error="errors" output="output">
 # code comes here
 </py-repl>
-</div><br/>
+</div>
 </div>
 <p id="repl-out" style="font-size: 70%; color: #777777;">(click on the green run button to run the code)</p>
 <p id="repl-err" style="font-size: 70%; color: #880000;"></p>
@@ -105,7 +105,7 @@ def controlCommand(x, mu):
 </div>
 </form>
 </div>
-</div> <!--sm-4-->
+</div> <!--sm-5-->
 </div> <!--row-->
 
 <!-- Import all the necessary JavaScript dependency modules
@@ -147,7 +147,7 @@ accessible from Python -->
         viewer3D = Viewer3D(
             document.getElementById('viewer3d'),
             parameters=dict(
-                logmap_sphere=True,
+                logmap_sphere=False,
                 theme=Themes.Simple,
             ),
             onready=onSceneReady,

@@ -108,6 +108,22 @@ def controlCommand(x, mu):
 </div> <!--sm-4-->
 </div> <!--row-->
 
+<!-- Import all the necessary JavaScript dependency modules
+Sadly, can't be imported from an external file for the moment, this is not supported by Chrome
+-->
+<script async="" src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.module.js",
+            "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/",
+            "xacro-parser": "https://cdn.jsdelivr.net/npm/xacro-parser@0.3.1/src/index.js",
+            "urdf-loader": "https://cdn.jsdelivr.net/npm/urdf-loader@0.10.4/src/URDFLoader.js",
+            "expr-eval": "https://cdn.jsdelivr.net/npm/expr-eval@2.0.2/dist/index.mjs"
+        }
+    }
+</script>
+
 <!-- We need to import our 'Viewer3D' JavaScript module, otherwise it is not
 accessible from Python -->
 <script type="module">

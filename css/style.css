@@ -77,3 +77,46 @@ https://coolors.co/29bf12-abff4f-08bdbd-f21b3f-ff9914
     font-weight: bold;
 }
 
+.py-repl-editor{
+  background: #EEEEEE;
+  box-sizing: border-box;
+  border-width: 0px;
+  border-style: solid;
+  border-color: rgb(209, 13, 19)
+}
+
+.spinner::after {
+  content: "";
+  box-sizing: border-box;
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
+  border-radius: 50%;
+}
+.py-overlay {
+  top: 0;
+  width: 110px;
+  height: 80px;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+  background: rgba(0, 0, 0, 1);
+}
+.py-pop-up {
+  text-align: center;
+  width: 80px;
+}
+.py-pop-up p {
+  font-size: 0px;
+  margin: 0px;
+}
+
+.generated-menu-item{
+  text-align: left;
+}
+
+.py-repl-run-button {
+  opacity: 1;
+}

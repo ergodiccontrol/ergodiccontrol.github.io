@@ -38,7 +38,9 @@ export default class Target extends THREE.Object3D {
             color = 0x0000aa;
 
         // Create the cone mesh
-        const geometry = new THREE.ConeGeometry(0.05, 0.1, 12);
+//        const geometry = new THREE.ConeGeometry(0.05, 0.1, 12);
+        const geometry = new THREE.SphereGeometry(0.02);
+        
 
         this.mesh = new THREE.Mesh(
             geometry,
@@ -56,15 +58,15 @@ export default class Target extends THREE.Object3D {
 
         this.add(this.mesh);
 
-        // Add a wireframe on top of the cone mesh
-        const wireframe = new THREE.WireframeGeometry(geometry);
+//        // Add a wireframe on top of the cone mesh
+//        const wireframe = new THREE.WireframeGeometry(geometry);
 
-        let line = new THREE.LineSegments(wireframe);
-        line.material.depthTest = true;
-        line.material.opacity = 0.5;
-        line.material.transparent = true;
+//        let line = new THREE.LineSegments(wireframe);
+//        line.material.depthTest = true;
+//        line.material.opacity = 0.5;
+//        line.material.transparent = true;
 
-        this.mesh.add(line);
+//        this.mesh.add(line);
 
         // Set the target position and orientation
         this.position.copy(position);

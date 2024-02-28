@@ -184,14 +184,14 @@ param.smc.dt = 1e-2 # Time step length
 param.hedac = lambda: None # All the hedac-related parameters will go there
 param.hedac.x0 = np.array([[.2, .3], [.1, .8]]) # Initial points
 param.hedac.nbAgents = 2
-param.hedac.diffusion = 1  # increases global behavior
-param.hedac.source_strength = 1	 # increases local behavior
-param.hedac.max_dx = 1 # maximum velocity of the agent
-param.hedac.max_ddx = 0.1 # maximum acceleration of the agent
-param.hedac.dx = 1
+param.hedac.diffusion = 1.0  # increases global behavior
+param.hedac.source_strength = 1.0	 # increases local behavior
+param.hedac.max_dx = 1.0 # maximum velocity of the agent
+param.hedac.max_ddx = 0.2 # maximum acceleration of the agent
+param.hedac.dx = 1.0
 param.hedac.nbRes = 100	# resolution of discretization
 param.hedac.min_kernel_val = 1e-8  # upper bound on the minimum value of the kernel
-param.hedac.agent_radius = 10  # changes the effect of the agent on the coverage
+param.hedac.agent_radius = 10.0  # changes the effect of the agent on the coverage
 
 
 ## Variables

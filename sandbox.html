@@ -109,8 +109,9 @@ update_ergodic_smc_control()
 </div>
 <div aria-labelledby="HEDAC-tab" class="tab-pane fade" id="HEDAC-tab-pane" role="tabpanel" tabindex="0">
 <py-repl error="errors" output="output">
-param.hedac.x0 = np.array([[.2, .3], [.1, .8]])
-param.hedac.nbAgents = 2
+#param.hedac.x0 = np.array([[.2, .3], [.1, .8]])
+param.hedac.x0 = np.array([.2, .3])
+param.hedac.nbAgents = 1
 
 param.nbGaussian = 2
 

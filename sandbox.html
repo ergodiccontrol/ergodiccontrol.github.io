@@ -1,101 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="description" content="Ergodic control">
-	<meta name="author" content="Sylvain Calinon">
-	<title>ICRA 2024 Tutorial on Ergodic Control</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Ergodic control">
+    <meta name="author" content="Sylvain Calinon">
+    <title>ICRA 2024 Tutorial on Ergodic Control</title>
 
-	<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css'>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-	<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Nixie+One|Ledger|Roboto+Mono&display=swap'>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Nixie+One|Ledger|Roboto+Mono&display=swap'>
 
-	<script defer src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js'></script>
+    <script defer src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js'></script>
 
-	<script defer src="https://pyscript.net/latest/pyscript.min.js"></script>
+    <script defer src="https://pyscript.net/latest/pyscript.min.js"></script>
 
-	<py-config type="toml">
-		packages = ['numpy']
-		[[fetch]]
-		from = './scripts/sandbox/'
-		files = ['smc_1d.py', 'smc_1d_ui.py', 'smc_1d_example.py', 'smc_2d.py', 'smc_2d_example.py', 'hedac.py', 'hedac_example.py', 'common.py', 'ui.py']
-	</py-config>
+    <py-config type="toml">
+        packages = ['numpy']
+        [[fetch]]
+            from = './scripts/sandbox/'
+            files = ['smc_1d.py', 'smc_1d_ui.py', 'smc_1d_example.py', 'smc_2d.py', 'smc_2d_example.py', 'hedac.py', 'hedac_example.py', 'common.py', 'ui.py']
+    </py-config>
 
-	<link href="https://pyscript.net/latest/pyscript.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="css/style.css">
+    <link href="https://pyscript.net/latest/pyscript.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body id="page-top">
 
-	<nav class="navbar navbar-expand-md navbar-light mybg-header p-0">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="index.html"><img style="height: 80px;" src="images/ergodic-logo.svg"></a>
-			</div>
-			<div class="navbar-collapse collapse" id="collapseNavbar">
-				1D &amp; 2D Sandbox
-				<ul class="navbar-nav ms-auto">
-					<li class="nav-item">
-						<a class="nav-link js-scroll-trigger" target="_blank" href="index.html">Ergodic Control Tutorial at ICRA 2024</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
+    <nav class="navbar navbar-expand-md navbar-light mybg-header p-0">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html"><img style="height: 80px;" src="images/ergodic-logo.svg"></a>
+            </div>
+            <div class="navbar-collapse collapse" id="collapseNavbar">
+                1D &amp; 2D Sandbox
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" target="_blank" href="index.html">Ergodic Control Tutorial at ICRA 2024</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-	<div class="container-fluid">
-		<div class="row">
-			<div class="col-sm-7">
-				<br>
-				<ul class="nav nav-tabs" id="myTab" role="tablist">
-					<li class="nav-item" role="presentation">
-						<button aria-controls="SMC1D-tab-pane" aria-selected="true" class="nav-link active" data-bs-target="#SMC1D-tab-pane"
-								data-bs-toggle="tab" id="SMC1D-tab" role="tab" type="button">SMC (1D)</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button aria-controls="SMC2D-tab-pane" aria-selected="false" class="nav-link" data-bs-target="#SMC2D-tab-pane"
-								data-bs-toggle="tab" id="SMC2D-tab" role="tab" type="button">SMC (2D)</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button aria-controls="HEDAC-tab-pane" aria-selected="false" class="nav-link" data-bs-target="#HEDAC-tab-pane"
-								data-bs-toggle="tab" id="HEDAC-tab" role="tab" type="button">HEDAC (2D)</button>
-					</li>
-				</ul>
-				<div class="tab-content" id="myTabContent">
-					<div aria-labelledby="SMC1D-tab" class="tab-pane fade show active" id="SMC1D-tab-pane" role="tabpanel" tabindex="0">
-						<py-repl id="SMC1D-tab-repl" output="output">
-						</py-repl>
-					</div>
-					<div aria-labelledby="SMC2D-tab" class="tab-pane fade" id="SMC2D-tab-pane" role="tabpanel" tabindex="0">
-						<py-repl id="SMC2D-tab-repl" output="output">
-						</py-repl>
-					</div>
-					<div aria-labelledby="HEDAC-tab" class="tab-pane fade" id="HEDAC-tab-pane" role="tabpanel" tabindex="0">
-						<py-repl id="HEDAC-tab-repl" output="output">
-						</py-repl>
-					</div>
-				</div>
-				<p style="font-size: 70%; color: #777777; margin-bottom: 0;">(click on the green button to run the code)</p>
-				<p id="help" style="font-size: 70%; color: #777777;"></p>
-				<p id="output" style="font-size: 70%; color: #000000; font-family: monospace;"></p>
-			</div> <!--sm-7-->
-			<div class="col-sm-5">
-				<div class="sticky-sm-top" style="padding: 2rem 1rem 1rem 1rem;">
-					<canvas height="900px" id="canvas" style="width:100%;" width="900px"></canvas>
-					<div id="legend" style="margin-top: 40px; font-size: 70%; color: #777777;"></div>
-				</div>
-			</div> <!--sm-5-->
-		</div> <!--row-->
-	</div> <!--container-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-7">
+                <br>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button aria-controls="SMC1D-tab-pane" aria-selected="true" class="nav-link active" data-bs-target="#SMC1D-tab-pane"
+                                data-bs-toggle="tab" id="SMC1D-tab" role="tab" type="button">SMC (1D)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button aria-controls="SMC2D-tab-pane" aria-selected="false" class="nav-link" data-bs-target="#SMC2D-tab-pane"
+                                data-bs-toggle="tab" id="SMC2D-tab" role="tab" type="button">SMC (2D)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button aria-controls="HEDAC-tab-pane" aria-selected="false" class="nav-link" data-bs-target="#HEDAC-tab-pane"
+                                data-bs-toggle="tab" id="HEDAC-tab" role="tab" type="button">HEDAC (2D)</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div aria-labelledby="SMC1D-tab" class="tab-pane fade show active" id="SMC1D-tab-pane" role="tabpanel" tabindex="0">
+                        <py-repl id="SMC1D-tab-repl" output="output">
+                        </py-repl>
+                    </div>
+                    <div aria-labelledby="SMC2D-tab" class="tab-pane fade" id="SMC2D-tab-pane" role="tabpanel" tabindex="0">
+                        <py-repl id="SMC2D-tab-repl" output="output">
+                        </py-repl>
+                    </div>
+                    <div aria-labelledby="HEDAC-tab" class="tab-pane fade" id="HEDAC-tab-pane" role="tabpanel" tabindex="0">
+                        <py-repl id="HEDAC-tab-repl" output="output">
+                        </py-repl>
+                    </div>
+                </div>
+                <p style="font-size: 70%; color: #777777; margin-bottom: 0;">(click on the green button to run the code)</p>
+                <p id="help" style="font-size: 70%; color: #777777;"></p>
+                <p id="output" style="font-size: 70%; color: #000000; font-family: monospace;"></p>
+            </div> <!--sm-7-->
+            <div class="col-sm-5">
+                <div class="sticky-sm-top" style="padding: 2rem 1rem 1rem 1rem;">
+                    <canvas id="canvas" style="width:100%;" width="900px" height="900px"></canvas>
+                    <canvas id="canvas_histogram" style="width:100%;" width="900px" height="900px"></canvas>
+                    <div id="legend" style="margin-top: 40px; font-size: 70%; color: #777777;"></div>
+                </div>
+            </div> <!--sm-5-->
+        </div> <!--row-->
+    </div> <!--container-->
 
-	<br><br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br><br><br>
 
-	<div class="navbar-light mybg-footer">
-		<br>
-		<center>Ergodic Control Tutorial at ICRA 2024</center>
-		<br>
-	</div>
+    <div class="navbar-light mybg-footer">
+        <br>
+        <center>Ergodic Control Tutorial at ICRA 2024</center>
+        <br>
+    </div>
 
 
 <py-script>
@@ -105,119 +106,128 @@ import asyncio
 
 # The configuration of each tab
 config = {
-	'SMC1D-tab': {
-		'scripts': {
-			'main': 'smc_1d.py',
-			'user': 'smc_1d_example.py',
-			'ui': 'smc_1d_ui.py',
-		},
-		'texts': {
-			'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_1d.py" target="#">this script</a>',
-			'legend': 'Top: the gaussians defined in <code>initial_state()</code><br>Middle: the trajectory, both in 1D (in black) and over time (in gray)<br>Bottom: histogram of the trajectory',
-		},
-	},
-	'SMC2D-tab': {
-		'scripts': {
-			'main': 'smc_2d.py',
-			'user': 'smc_2d_example.py',
-			'ui': 'ui.py',
-			'common': 'common.py',
-		},
-		'texts': {
-			'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_2d.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
-			'legend': '',
-		},
-	},
-	'HEDAC-tab': {
-		'scripts': {
-			'main': 'hedac.py',
-			'user': 'hedac_example.py',
-			'ui': 'ui.py',
-			'common': 'common.py',
-		},
-		'texts': {
-			'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/hedac.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
-			'legend': '',
-		},
-	}
+    'SMC1D-tab': {
+        'scripts': {
+            'main': 'smc_1d.py',
+            'user': 'smc_1d_example.py',
+            'ui': 'smc_1d_ui.py',
+        },
+        'texts': {
+            'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_1d.py" target="#">this script</a>',
+            'legend': 'Top: the gaussians defined in <code>initialState()</code><br>Middle: the trajectory, both in 1D (in black) and over time (in gray)<br>Bottom: histogram of the trajectory',
+        },
+    },
+    'SMC2D-tab': {
+        'scripts': {
+            'main': 'smc_2d.py',
+            'user': 'smc_2d_example.py',
+            'ui': 'ui.py',
+            'common': 'common.py',
+        },
+        'texts': {
+            'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_2d.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
+            'legend': '',
+        },
+        'has_histogram': True,
+    },
+    'HEDAC-tab': {
+        'scripts': {
+            'main': 'hedac.py',
+            'user': 'hedac_example.py',
+            'ui': 'ui.py',
+            'common': 'common.py',
+        },
+        'texts': {
+            'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/hedac.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
+            'legend': '',
+        },
+        'has_histogram': True,
+    }
 }
 
 
 # UI-related variables
 canvas = document.getElementById('canvas')
+canvas_histogram = document.getElementById('canvas_histogram')
 ctx = canvas.getContext('2d')
+ctx_histogram = canvas_histogram.getContext('2d')
 output = document.getElementById('output')
 help = document.getElementById('help')
 legend = document.getElementById('legend')
 
 
 def onTabClicked(event):
-	unregister_listeners()
-	switch_to_tab(event.target.id)
-	register_listeners()
+    unregister_listeners()
+    switch_to_tab(event.target.id)
+    register_listeners()
 
 
 # Initialise all the tabs
 for tab, entry in config.items():
-	scripts = entry['scripts']
-	
-	for id, filename in scripts.items():
-		with open(filename, 'r') as f:
-			code = f.read()
+    scripts = entry['scripts']
+    
+    for id, filename in scripts.items():
+        with open(filename, 'r') as f:
+            code = f.read()
 
-		scripts[id] = {
-			'filename': filename,
-			'code': code,
-		} 
+        scripts[id] = {
+            'filename': filename,
+            'code': code,
+        } 
 
-	editor = document.getElementById(tab + '-repl')
-	editor.textContent = scripts['user']['code']
+    editor = document.getElementById(tab + '-repl')
+    editor.textContent = scripts['user']['code']
 
-	button = document.getElementById(tab)
-	button.onclick = onTabClicked
+    button = document.getElementById(tab)
+    button.onclick = onTabClicked
 
 
 def switch_to_tab(id):
-	output.innerText = ''
+    output.innerText = ''
 
-	entry = config[id]
+    entry = config[id]
 
-	texts = entry['texts']
-	help.innerHTML = texts['help']
-	legend.innerHTML = texts['legend']
+    if ('has_histogram' in entry) and entry['has_histogram']:
+        canvas_histogram.style.display = 'inline';
+    else:
+        canvas_histogram.style.display = 'none';
 
-	scripts = entry['scripts']
-	exec(scripts['main']['code'], globals())
-	exec(scripts['ui']['code'], globals())
+    texts = entry['texts']
+    help.innerHTML = texts['help']
+    legend.innerHTML = texts['legend']
 
-	if 'common' in scripts:
-		exec(scripts['common']['code'], globals())
+    scripts = entry['scripts']
+    exec(scripts['main']['code'], globals())
+    exec(scripts['ui']['code'], globals())
 
-	editor = document.getElementById(id + '-repl')
-	try:
-		user_code = editor.getPySrc()
-	except AttributeError:
-		user_code = editor.textContent
+    if 'common' in scripts:
+        exec(scripts['common']['code'], globals())
 
-	exec(user_code, globals())
+    editor = document.getElementById(id + '-repl')
+    try:
+        user_code = editor.getPySrc()
+    except AttributeError:
+        user_code = editor.textContent
+
+    exec(user_code, globals())
 
 
 terminal = document.getElementsByClassName('py-terminal-docked')
 if terminal.length == 1:
-	terminal[0].remove()
+    terminal[0].remove()
 
 switch_to_tab('SMC1D-tab')
 
 
 async def main():
-	while True:
-		# Call the appropriate update function
-		update()
+    while True:
+        # Call the appropriate update function
+        update()
 
-		# Update the rendering
-		draw_scene(param)
+        # Update the rendering
+        draw_scene(param)
 
-		await asyncio.sleep(1E-6)
+        await asyncio.sleep(1E-6)
 
 pyscript.run_until_complete(main())
 </py-script>

@@ -1,13 +1,9 @@
 html {
-  font-size: 100%;
-}
-
-header {
-	padding: 154px 0 100px;
+  font-size: 1vw;
 }
 
 section {
-	padding: 100px 0;
+	padding: 4vw 0;
 }
 
 body {
@@ -19,8 +15,8 @@ h2 {
 	font-family: 'Nixie One', sans-serif;
     font-weight: bold;
     font-style: normal;
-	font-size: 38px;
-	padding: 0 0 30px 0;
+	font-size: 2vw;
+	padding: 0 0 2vw 0;
 }
 
 a { 
@@ -69,6 +65,7 @@ https://coolors.co/29bf12-abff4f-08bdbd-f21b3f-ff9914
 
 .mybg-schedule {
 	font-family: 'Roboto Mono', sans-serif;
+	font-size: .8vw;
 }
 
 .mybg-footer {

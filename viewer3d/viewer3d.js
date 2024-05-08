@@ -6009,6 +6009,10 @@ class Viewer3D {
 
         // Ensure that the camera isn't below the floor
         this.cameraControl.target.y = Math.max(this.cameraControl.target.y, 0.0);
+        if (this.camera.position.y < 0.1) {
+            this.camera.position.y = 0.1;
+            this.cameraControl.update();
+        }
 
         // Synchronize the robots (if necessary)
         const cameraPosition = new THREE.Vector3();

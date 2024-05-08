@@ -221,6 +221,8 @@ def switch_to_tab(id):
 
     exec(user_code, globals())
 
+    reset()
+
 
 terminal = document.getElementsByClassName('py-terminal-docked')
 if terminal.length == 1:

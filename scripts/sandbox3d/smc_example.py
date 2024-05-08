@@ -1,39 +1,14 @@
-def initialState():
-    """The initial state, customize it to your liking"""
+# Initial robot state
+param.x0 = [0.5, -0.3, 0.0, -1.8, 0.0, 1.5, 1.0]
 
-    # Initial robot state
-    x = [0.5, -0.3, 0.0, -1.8, 0.0, 1.5, 1.0]
-
-    # Gaussian centers (as many as you want, one per row)
-    Mu = np.array([
-        [.8, .6, .5],
-        [.8, .5, .6],
-    ])
-
-    # Gaussian covariances, defined by a direction vector, a scale and a regularization factor
-    # direction vectors (one per row)
-    Sigma_vectors = np.array([
-        [.1, .1, 1.],
-        [.1, 1., .1],
-    ])
-    # scales
-    Sigma_scales = np.array([
-        3E-1,
-        2E-1,
-    ])
-    # regularization factors
-    Sigma_regularizations = np.array([
-        1E-3,
-        1E-3,
-    ])
-
-    return (x, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations)
+# Number of gaussians
+param.nbGaussian = 2
 
 
 def ergodicControl(x, t, wt, param):
     # Depends on the current position only here, outputs: dphi, phix, phiy, phiz
     ang = x[:, np.newaxis] * param.rg * param.omega
-    phi1 = np.cos(ang) #Eq.(18)
+    phi1 = np.cos(ang)
     dphi1 = -np.sin(ang) * np.tile(param.rg, (param.nbVar, 1)) * param.omega
     phix = phi1[0, param.xx-1].flatten()
     phiy = phi1[1, param.yy-1].flatten()
@@ -47,7 +22,7 @@ def ergodicControl(x, t, wt, param):
     wt = wt + (phix * phiy * phiz).T / (param.L**param.nbVar)
 
     # Controller with constrained velocity norm
-    u = -dphi @ (param.Lambda * (wt/(t+1) - param.w_hat)) # Eq.(24)
+    u = -dphi @ (param.Lambda * (wt/(t+1) - param.w_hat))
     u = u * param.u_max / (np.linalg.norm(u) + 0.1) # Velocity command
 
     # Update of the position
@@ -59,9 +34,14 @@ def ergodicControl(x, t, wt, param):
 def controlCommand(x, t, wt, param):
     J = Jkin(x)
     f = fkin(x)
+
+    # Primary task: ergodic control
     e, wt = ergodicControl(f[:3], t, wt, param)
     u = np.linalg.pinv(J[:3,:]) @ (e - f[:3])
+
+    # Secondary task: preferred pose maintenance
+    N = np.eye(7) - np.linalg.pinv(J[:3,:]) @ J[:3,:] # Nullspace projection matrix
+    xh = np.array([0.0, 0.0, 0.0, -1.5, 0.0, 1.5, 1])
+    u = u + N @ (xh - x)
+
     return u, wt
-
-
-reset()

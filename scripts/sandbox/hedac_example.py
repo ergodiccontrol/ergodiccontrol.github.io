@@ -1,35 +1,10 @@
-def initialState():
-    """The initial state, customize it to your liking"""
+# Initial position of the the agents (as many as you want, one per row)
+param.x0 = np.array([
+    [.2, .3],
+])
 
-    # Initial position of the the agents (as many as you want, one per row)
-    x0 = np.array([
-        [.2, .3],
-    ])
-
-    # Gaussian centers (as many as you want, one per row)
-    Mu = np.array([
-        [.3, .7],
-        [.7, .3],
-    ])
-
-    # Gaussian covariances, defined by a direction vector, a scale and a regularization factor
-    # direction vectors (one per row)
-    Sigma_vectors = np.array([
-        [.3, .1],
-        [.1, .2],
-    ])
-    # scales
-    Sigma_scales = np.array([
-        1E-1,
-        5E-1,
-    ])
-    # regularization factors
-    Sigma_regularizations = np.array([
-        1E-3,
-        3E-3,
-    ])
-
-    return (x0, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations)
+# Number of gaussians
+param.nbGaussian = 2
 
 
 def controlCommand(agents, goal_density, coverage_density, heat, coverage_block, param):
@@ -100,6 +75,3 @@ def controlCommand(agents, goal_density, coverage_density, heat, coverage_block,
         agent.update(grad)
 
     return coverage_density, heat
-
-
-reset()

@@ -5,7 +5,6 @@ from js import Path2D
 ## Parameters
 # ===============================
 param = lambda: None # Lazy way to define an empty class in python
-param.nbData = 5000  # Number of datapoints
 param.nbFct = 10     # Number of basis functions along x and y
 param.nbVar = 2      # Dimension of the space
 param.nbGaussian = 2 # Number of Gaussians to represent the spatial distribution
@@ -28,7 +27,6 @@ param.omega = 2 * np.pi / param.L # omega
 
 ## Variables
 # ===============================
-t = None
 agents = None
 goal_density = None
 coverage_density = None
@@ -36,9 +34,6 @@ heat = None
 coverage_block = None
 
 r_x = None
-hist = None
-xbins = None
-ybins = None
 
 
 # HEDAC-related functions
@@ -191,7 +186,7 @@ def discretize_gmm(param, KX):
 
     # Fourier basis functions (for a discretized map)
     xm1d = np.linspace(param.xlim[0], param.xlim[1], param.nbRes)    # Spatial range
-    xm = np.zeros((param.nbGaussian, param.nbRes, param.nbRes))
+    xm = np.zeros((param.nbVar, param.nbRes, param.nbRes))
     xm[0, :, :], xm[1, :, :] = np.meshgrid(xm1d, xm1d)
     # Mind the flatten() !!!
     ang1 = (
@@ -266,22 +261,20 @@ def calculate_gradient(agent, gradient_x, gradient_y):
 # Reset function
 # ===============================
 def reset(reset_state=True):
-    global agents, goal_density, coverage_density, heat, coverage_block, param, controls, paths, hist, r_x
+    global agents, goal_density, coverage_density, heat, coverage_block, param, controls, paths, r_x
 
-    # Retrieve the initial state defined by the user
-    if reset_state:
-        (x0, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations) = initialState()
+    # Retrieve the initial positions defined by the user
+    param.x0 = np.array(param.x0)
+    if (len(param.x0.shape) != 2) or (param.x0.shape[1] != 2):
+        print("Error: 'param.x0' must be a Nx2 matrix, with 'N' the number of agents")
+        return
 
-        param.x0 = np.array(x0)
+    param.x0 = np.clip(param.x0, 0.01, 0.99) # x0 should be within [0,1]
+    param.nbAgents = param.x0.shape[0]
 
-        if (len(param.x0.shape) != 2) or (param.x0.shape[1] != 2):
-            print("Error: 'x0' must be a Nx2 matrix, with 'N' the number of agents")
-            return
-
-        param.nbAgents = param.x0.shape[0]
-
-        if not create_gaussians(Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations):
-            return
+    # Retrieve the number of gaussians defined by the user, and create/delete existing ones as needed
+    param.nbGaussian = max(int(param.nbGaussian), 1)
+    update_gaussians(param)
 
     # Initialize agents
     agents = []
@@ -326,7 +319,6 @@ def reset(reset_state=True):
 
     # Other initializations
     r_x = np.array((0, 2))
-    hist = None
 
     controls = create_gaussian_controls(param)
     paths = [ Path2D.new() for n in range(param.nbAgents) ]
@@ -335,11 +327,7 @@ def reset(reset_state=True):
 # Update function
 # ===============================
 def update():
-    global agents, goal_density, coverage_density, heat, coverage_block, param, paths, r_x, hist, xbins, ybins
-
-    # We only compute 'nbData' values
-    if r_x.shape[0] >= param.nbData:
-        return
+    global agents, goal_density, coverage_density, heat, coverage_block, param, paths, r_x
 
     x_prev = [ agent.x.copy() / param.nbRes for agent in agents ]
 
@@ -353,4 +341,8 @@ def update():
 
     r_x = np.vstack((r_x, x))
 
-    hist, xbins, ybins = np.histogram2d(r_x[:, 1], r_x[:, 0], bins=20, range=np.array([param.xlim, param.xlim]))
+
+# Rendering function
+# ===============================
+def draw_histograms():
+    pass

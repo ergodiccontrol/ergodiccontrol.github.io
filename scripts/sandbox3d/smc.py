@@ -4,14 +4,15 @@ import numpy as np
 ## Parameters
 # ===============================
 param = lambda: None # Lazy way to define an empty class in python
-param.x0 = None      # Initial position
-param.nbData = 10000  # Number of datapoints
 param.nbFct = 10     # Number of basis functions along x, y and z
 param.nbVar = 3      # Dimension of the space
 param.nbGaussian = 2 # Number of Gaussians to represent the spatial distribution
 param.dt = 1e-2      # Time step
-param.u_max = 2.0    # Maximum speed allowed
+param.u_max = 10.0    # Maximum speed allowed
 param.xlim = [0, 1]  # Domain limit
+
+# Initial robot state
+param.x0 = [0.5, -0.3, 0.0, -1.8, 0.0, 1.5, 1.0]
 
 param.L = (param.xlim[1] - param.xlim[0]) * 2  # Size of [-xlim(0),xlim(1)]
 param.omega = 2 * np.pi / param.L # omega
@@ -30,19 +31,16 @@ def reset(reset_state=True):
     global t, wt, param, trajectory
 
     # Retrieve the initial state defined by the user
-    (positions, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations) = initialState()
-
-    positions = np.array(positions)
-    if (len(positions.shape) != 1) or (positions.shape[0] != 7):
-        print("Error: 'positions' must be a vector of size 7")
+    param.x0 = np.array(param.x0)
+    if (len(param.x0.shape) != 1) or (param.x0.shape[0] != 7):
+        print("Error: 'param.x0' must be a vector of size 7")
         return
 
-    robot.jointPositions = positions
-    param.x0 = robot.fkin(positions)[:3]
+    robot.jointPositions = param.x0
 
-    if reset_state:
-        if not create_gaussians(Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations):
-            return
+    # Retrieve the number of gaussians defined by the user, and create/delete existing ones as needed
+    param.nbGaussian = max(int(param.nbGaussian), 1)
+    update_gaussians(param)
 
     # Compute the desired spatial distribution
     param.rg = np.arange(0, param.nbFct, dtype=float)
@@ -79,17 +77,13 @@ def reset(reset_state=True):
 def update():
     global t, wt, trajectory, param
 
-    # We only compute 'nbData' values
-    if t >= param.nbData:
-        return
-
     t += 1
 
     # Retrieve the command
     u, wt = controlCommand(robot.jointPositions, t, wt, param)
 
     # Apply the command to the robot
-    robot.control = robot.control + u #* 0.1
+    robot.control = robot.control + u * 0.2
 
     # Update the list of points used to draw the trajectory
     ee = robot.fkin(robot.jointPositions)

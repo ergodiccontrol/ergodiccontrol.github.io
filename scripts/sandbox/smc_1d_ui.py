@@ -11,7 +11,9 @@ MARGIN = 0.05
 GAUSSIANS_POSITION = 1.0 - GAUSSIANS_HEIGHT - 0.1
 PATH_1D_POSITION = GAUSSIANS_POSITION - MARGIN
 
-PATH_2D_HEIGHT = PATH_1D_POSITION - HISTOGRAM_HEIGHT - MARGIN
+PATH_2D_HEIGHT = PATH_1D_POSITION - 2 * HISTOGRAM_HEIGHT - MARGIN - MARGIN / 2
+NB_DATA_MAX = 2000
+SPLITS_LENGTH = 500
 
 
 def clear_screen():
@@ -67,21 +69,38 @@ def draw_scene(param):
     ctx.arc(r_x[-1], 0.0, 0.01, 0, 2*np.pi)
     ctx.fill()
 
-    # Draw histogram
-    ctx.setTransform(canvas.width, 0, 0, -canvas.height, 0, canvas.height)
-    if hist is not None:
-        normalized = hist.copy() / np.sum(hist)
-        normalized = normalized / np.max(normalized)
-        for k in range(len(hist)):
-            color = (1.0 - normalized[k]) * 255
-            ctx.fillStyle = f'rgb({color}, {color}, {color})'
-            ctx.fillRect(bins[k], 0.0, bins[k+1] - bins[k], HISTOGRAM_HEIGHT)
-
     # Draw ergodic control 2D path
-    ctx.translate(0, PATH_1D_POSITION - t / param.nbData * PATH_2D_HEIGHT)
+    ctx.setTransform(canvas.width, 0, 0, -canvas.height, 0, canvas.height)
     ctx.lineWidth = 0.002
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)'
-    ctx.stroke(path_2d)
+
+    position = (t-1) % SPLITS_LENGTH + (len(paths_2d) - 1) * SPLITS_LENGTH
+    ctx.translate(0, PATH_1D_POSITION - position / NB_DATA_MAX * PATH_2D_HEIGHT)
+    for i, path in enumerate(paths_2d):
+        ctx.stroke(path)
+        ctx.translate(0, SPLITS_LENGTH / NB_DATA_MAX * PATH_2D_HEIGHT)
+
+    # Draw histograms
+    ctx.setTransform(canvas.width, 0, 0, -canvas.height, 0, canvas.height)
+    ctx.fillStyle = 'rgb(255, 255, 255)'
+    ctx.fillRect(0.0, 0.0, 1.0, 2 * HISTOGRAM_HEIGHT + MARGIN + MARGIN / 2)
+
+    w_min = np.min(param.w_hat)
+    w_max = np.max(param.w_hat)
+    w_hat = (param.w_hat - w_min) / (w_max - w_min)
+
+    wt2 = (wt / t - w_min) / (w_max - w_min)
+    dim = 1.0 / param.nbFct
+
+    for kx in range(param.nbFct):
+        color = (1.0 - w_hat[kx, 0]) * np.array([255, 165, 0])
+        ctx.fillStyle = f'rgb({color[0]}, {color[1]}, {color[2]})'
+        ctx.fillRect(kx*dim, HISTOGRAM_HEIGHT + MARGIN / 2, dim*1.1, HISTOGRAM_HEIGHT)
+
+        color = (1.0 - wt2[kx, 0]) * 255
+        ctx.fillStyle = f'rgb({color}, {color}, {color})'
+        ctx.fillRect(kx*dim, 0, dim*1.1, HISTOGRAM_HEIGHT)
+
 
 
 def register_listeners():

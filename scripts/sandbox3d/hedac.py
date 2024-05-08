@@ -4,7 +4,6 @@ import numpy as np
 ## Parameters
 # ===============================
 param = lambda: None # Lazy way to define an empty class in python
-param.nbData = 8000  # Number of datapoints
 param.nbFct = 10     # Number of basis functions along x, y and z
 param.nbVar = 3      # Dimension of the space
 param.nbGaussian = 2 # Number of Gaussians to represent the spatial distribution
@@ -18,6 +17,9 @@ param.dx = 1
 param.nbRes = 25 # resolution of discretization
 param.min_kernel_val = 1e-8  # upper bound on the minimum value of the kernel
 param.agent_radius = 1  # changes the effect of the agent on the coverage
+
+# Initial robot state
+param.x0 = [0.5, -0.3, 0.0, -1.8, 0.0, 1.5, 1.0]
 
 param.L = (param.xlim[1] - param.xlim[0]) * 2  # Size of [-xlim(0),xlim(1)]
 param.omega = 2 * np.pi / param.L # omega
@@ -289,18 +291,16 @@ def reset(reset_state=True):
     global agent, goal_density, coverage_density, heat, coverage_block, param, trajectory
 
     # Retrieve the initial state defined by the user
-    (positions, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations) = initialState()
-
-    positions = np.array(positions)
-    if (len(positions.shape) != 1) or (positions.shape[0] != 7):
-        print("Error: 'positions' must be a vector of size 7")
+    param.x0 = np.array(param.x0)
+    if (len(param.x0.shape) != 1) or (param.x0.shape[0] != 7):
+        print("Error: 'param.x0' must be a vector of size 7")
         return
 
-    robot.jointPositions = positions
+    robot.jointPositions = param.x0
 
-    if reset_state:
-        if not create_gaussians(Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations):
-            return
+    # Retrieve the number of gaussians defined by the user, and create/delete existing ones as needed
+    param.nbGaussian = max(int(param.nbGaussian), 1)
+    update_gaussians(param)
 
     # Initialize the agent
     agent = SecondOrderAgent(param.nbVar, max_dx=param.max_dx, max_ddx=param.max_ddx)
@@ -350,10 +350,6 @@ def reset(reset_state=True):
 # ===============================
 def update():
     global agent, goal_density, coverage_density, heat, coverage_block, param, trajectory
-
-    # We only compute 'nbData' values
-    if agent.t >= param.nbData:
-        return
 
     # Compute the command
     u, coverage_density, heat = controlCommand(robot.jointPositions, agent, goal_density, coverage_density, heat, coverage_block, param)

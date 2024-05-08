@@ -6,11 +6,10 @@ from js import Path2D
 # ===============================
 param = lambda: None # Lazy way to define an empty class in python
 param.x0 = .1        # Initial position
-param.nbData = 2000  # Number of datapoints
 param.nbFct = 10     # Number of basis functions
 param.nbGaussian = 1 # Number of Gaussians to represent the spatial distribution
 param.dt = 1e-2      # Time step
-param.u_max = 1e-0   # Maximum speed allowed
+param.u_max = 2.0   # Maximum speed allowed
 param.xlim = [0, 1]  # Domain limit
 
 param.L = (param.xlim[1] - param.xlim[0]) * 2  # Size of [-xlim(0),xlim(1)]
@@ -25,15 +24,13 @@ r_x = []
 wt = np.zeros((param.nbFct, 1))
 
 path_1d = None
-path_2d = None
-hist = None
-bins = None
+paths_2d = None
 
 
 # Reset function
 # ===============================
 def reset():
-    global x, r_x, t, wt, param, path_1d, path_2d
+    global x, r_x, t, wt, param, path_1d, paths_2d
 
     # Retrieve the initial state defined by the user
     (param.x0, Mu, Sigma) = initialState()
@@ -56,13 +53,13 @@ def reset():
 
     rg = np.arange(param.nbFct, dtype=float).reshape((param.nbFct, 1))
     param.kk = rg * param.omega
-    param.Lambda = (rg**2 + 1) ** -1 # Weighting vector (Eq.(15)
+    param.Lambda = (rg**2 + 1) ** -1 # Weighting vector
 
     # Explicit description of w_hat by exploiting the Fourier transform
     # properties of Gaussians (optimized version by exploiting symmetries)
     param.w_hat = np.zeros((param.nbFct, 1))
     for j in range(param.nbGaussian):
-        param.w_hat = param.w_hat + param.Priors[j] * np.cos(param.kk * Mu[j]) * np.exp(-.5 * param.kk**2 * param.Sigma[j]) # Eq.(22)
+        param.w_hat = param.w_hat + param.Priors[j] * np.cos(param.kk * Mu[j]) * np.exp(-.5 * param.kk**2 * param.Sigma[j])
 
     param.w_hat = param.w_hat / param.L
 
@@ -73,17 +70,13 @@ def reset():
     wt = np.zeros((param.nbFct, 1))
 
     path_1d = Path2D.new()
-    path_2d = Path2D.new()
+    paths_2d = []
 
 
 # Update function
 # ===============================
 def update():
-    global x, r_x, t, wt, param, path_1d, path_2d, hist, bins
-
-    # We only compute 'nbData' values
-    if t >= param.nbData:
-        return
+    global x, r_x, t, wt, param, path_1d, paths_2d
 
     t += 1
     x_prev = x
@@ -102,12 +95,21 @@ def update():
     x += u * param.dt
 
     # Update the paths (for rendering)
+    offset = (t - 1) % SPLITS_LENGTH
+    if offset == 0:
+        path_1d = Path2D.new()
+        if len(r_x) > 0:
+            path_1d.moveTo(np.min(r_x), 0.0)
+            path_1d.lineTo(np.max(r_x), 0.0)
+
+        paths_2d.append(Path2D.new())
+        if len(paths_2d) > 5:
+            paths_2d = paths_2d[1:]
+
     path_1d.moveTo(x_prev, 0.0)
     path_1d.lineTo(x, 0.0)
 
-    path_2d.moveTo(x_prev, (t-1) / param.nbData * PATH_2D_HEIGHT)
-    path_2d.lineTo(x, t / param.nbData * PATH_2D_HEIGHT)
+    paths_2d[-1].moveTo(x_prev, (offset-1) / NB_DATA_MAX * PATH_2D_HEIGHT)
+    paths_2d[-1].lineTo(x, offset / NB_DATA_MAX * PATH_2D_HEIGHT)
 
-    # Recompute the histogram (for rendering)
     r_x.append(x)
-    hist, bins = np.histogram(r_x, bins=20, range=param.xlim)

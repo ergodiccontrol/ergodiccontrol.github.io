@@ -21,7 +21,7 @@ def controlCommand(x, t, wt, param):
     # Fourier basis functions and derivatives for each dimension
     # (only cosine part on [0,L/2] is computed since the signal
     # is even and real by construction)
-    phi = np.cos(x * param.kk)  # Eq.(18)
+    phi = np.cos(x * param.kk)
 
     # Gradient of basis functions
     dphi = -np.sin(x * param.kk) * param.kk
@@ -30,10 +30,7 @@ def controlCommand(x, t, wt, param):
     wt = wt + phi / param.L
 
     # Controller with constrained velocity norm
-    u = -dphi.T @ (param.Lambda * (wt / (t + 1) - param.w_hat))  # Eq.(24)
+    u = -dphi.T @ (param.Lambda * (wt / (t + 1) - param.w_hat))
     u = u * param.u_max / (np.linalg.norm(u) + 1e-2)  # Velocity command
 
     return u, wt
-
-
-reset()

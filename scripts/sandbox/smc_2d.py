@@ -6,7 +6,6 @@ from js import Path2D
 # ===============================
 param = lambda: None # Lazy way to define an empty class in python
 param.x0 = [.2, .3]  # Initial position
-param.nbData = 5000  # Number of datapoints
 param.nbFct = 10     # Number of basis functions along x and y
 param.nbVar = 2      # Dimension of the space
 param.nbGaussian = 2 # Number of Gaussians to represent the spatial distribution
@@ -23,38 +22,30 @@ param.omega = 2 * np.pi / param.L # omega
 x = None
 t = None
 wt = None
-r_x = None
-
-hist = None
-xbins = None
-ybins = None
 
 
 # Reset function
 # ===============================
-def reset(reset_state=True):
-    global x, t, wt, r_x, param, controls, paths
+def reset():
+    global x, t, wt, param, controls, paths
 
-    # Retrieve the initial state defined by the user
-    if reset_state:
-        (x0, Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations) = initialState()
+    # Retrieve the initial position defined by the user
+    param.x0 = np.array(param.x0)
+    if (len(param.x0.shape) != 1) or (param.x0.shape[0] != 2):
+        print("Error: 'param.x0' must be a vector of size 2")
+        return
 
-        param.x0 = np.array(x0)
-        if (len(param.x0.shape) != 1) or (param.x0.shape[0] != 2):
-            print("Error: 'x0' must be a vector of size 2")
-            return
+    param.x0 = np.clip(param.x0, 0.01, 0.99) # x0 should be within [0,1]
 
-        param.x0 = np.clip(param.x0, 0.01, 0.99) # x0 should be within [0,1]
+    # Retrieve the number of gaussians defined by the user, and create/delete existing ones as needed
+    param.nbGaussian = max(int(param.nbGaussian), 1)
+    update_gaussians(param)
 
-        if not create_gaussians(Mu, Sigma_vectors, Sigma_scales, Sigma_regularizations):
-            return
-
-    # Compute the desired spatial distribution
+    # Compute Fourier series coefficients w_hat of desired spatial distribution
     param.rg = np.arange(0, param.nbFct, dtype=float)
     KX = np.zeros((param.nbVar, param.nbFct, param.nbFct))
     KX[0,:,:], KX[1,:,:] = np.meshgrid(param.rg, param.rg)
 
-    # Weighting vector (Eq.(16))
     sp = (param.nbVar + 1) / 2 # Sobolev norm parameter
     param.Lambda = np.array(KX[0,:].flatten()**2 + KX[1,:].flatten()**2 + 1).T**(-sp)
     param.op = hadamard_matrix(2**(param.nbVar-1))
@@ -71,20 +62,16 @@ def reset(reset_state=True):
     t = 0
     wt = np.zeros(param.nbFct**param.nbVar)
     r_x = np.array((0, 2))
+    r_g = None
 
     controls = create_gaussian_controls(param)
     paths = [ Path2D.new() ]
-    hist = None
 
 
 # Update function
 # ===============================
 def update():
-    global x, t, wt, r_x, param, paths, hist, xbins, ybins
-
-    # We only compute 'nbData' values
-    if t >= param.nbData:
-        return
+    global x, t, wt, param, paths
 
     t += 1
     x_prev = x.copy()
@@ -100,6 +87,30 @@ def update():
     path.moveTo(x_prev[0], x_prev[1])
     path.lineTo(x[0], x[1])
 
-    # Recompute the histogram (for rendering)
-    r_x = np.vstack((r_x, x))
-    hist, xbins, ybins = np.histogram2d(r_x[:, 1], r_x[:, 0], bins=20, range=np.array([param.xlim, param.xlim]))
+
+# Rendering function
+# ===============================
+def draw_histograms():
+    global wt
+
+    if wt is None:
+        return
+
+    ctx_histogram.setTransform(canvas_histogram.width, 0, 0, -canvas_histogram.height, 0, canvas_histogram.height)
+
+    w_min = np.min(param.w_hat)
+    w_max = np.max(param.w_hat)
+    w_hat = (np.reshape(param.w_hat, [param.nbFct, param.nbFct]).T - w_min) / (w_max - w_min)
+
+    wt2 = (np.reshape(wt / t, [param.nbFct, param.nbFct]).T - w_min) / (w_max - w_min)
+    dim = 0.48 / param.nbFct
+
+    for ky in range(param.nbFct):
+        for kx in range(param.nbFct):
+            color = (1.0 - w_hat[ky, kx]) * np.array([255, 165, 0])
+            ctx_histogram.fillStyle = f'rgb({color[0]}, {color[1]}, {color[2]})'
+            ctx_histogram.fillRect(kx*dim, 1.0 - ky*dim*2, dim*1.1, -dim*2.2)
+
+            color = (1.0 - wt2[ky, kx]) * 255
+            ctx_histogram.fillStyle = f'rgb({color}, {color}, {color})'
+            ctx_histogram.fillRect(0.52 + kx*dim, 1.0 - ky*dim*2, dim*1.1, -dim*2.2)

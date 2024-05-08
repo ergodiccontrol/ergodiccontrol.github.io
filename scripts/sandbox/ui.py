@@ -32,7 +32,7 @@ def onMouseMove(event):
             controls.xPos[:, id] += mouse_pos - controls.Mu[:, id]
             controls.yPos[:, id] += mouse_pos - controls.Mu[:, id]
             controls.Mu[:, id] = mouse_pos
-            param.Mu[:, id] = mouse_pos
+            gaussians.Mu[:, id] = mouse_pos
 
         else:
             if i == 1:
@@ -59,7 +59,7 @@ def onMouseMove(event):
             RG[:,0] = controls.xPos[:,id] - controls.Mu[:,id]
             RG[:,1] = controls.yPos[:,id] - controls.Mu[:,id]
 
-            param.Sigma[:, :, id] = (RG @ RG.T) / 2.0
+            gaussians.Sigma[:, :, id] = (RG @ RG.T) / 2.0
 
         return
 
@@ -87,7 +87,7 @@ def onMouseUp(event):
     global manipulated_point
     if manipulated_point is not None:
         manipulated_point = (manipulated_point[0], manipulated_point[1], False)
-        reset(reset_state=False)
+        reset()
 
 
 def register_listeners():
@@ -117,53 +117,24 @@ def unregister_listeners():
 def create_gaussian_controls(param):
     controls = lambda: None # Lazy way to define an empty class in python
     controls.nbGaussian = param.nbGaussian
-    controls.Mu = np.array(param.Mu)
+    controls.Mu = np.array(gaussians.Mu)
     controls.xPos = np.zeros((param.nbVar, param.nbGaussian))
     controls.yPos = np.zeros((param.nbVar, param.nbGaussian))
     controls.radius = 0.01
 
     for id in range(controls.nbGaussian):
-        s, U = np.linalg.eig(param.Sigma[:2, :2, id])
+        s, U = np.linalg.eig(gaussians.Sigma[:2, :2, id])
         D = np.diag(s) * 2 # Contours are drawn with two standard deviations
         R = np.real(U @ np.sqrt(D+0j))
 
-        controls.xPos[:2,id] = (R @ np.array([1.0, 0.0])).T + param.Mu[:2,id]
-        controls.yPos[:2,id] = (R @ np.array([0.0, 1.0])).T + param.Mu[:2,id]
+        controls.xPos[:2,id] = (R @ np.array([1.0, 0.0])).T + gaussians.Mu[:2,id]
+        controls.yPos[:2,id] = (R @ np.array([0.0, 1.0])).T + gaussians.Mu[:2,id]
 
     RG = np.ndarray((2, 2))
     RG[:,0] = (controls.xPos[:,0] - controls.Mu[:,0])
     RG[:,1] = (controls.yPos[:,0] - controls.Mu[:,0])
 
     return controls
-
-
-## Helpers
-# =====================================
-
-def line_segment_and_circle_intersect(cx, cy, radius, x1, y1, x2, y2):
-    # First, we find the equation of the line that passes through the two points (x1, y1) and (x2, y2)
-    # The equation of a line in the form y = mx + b is given by:
-    #   y - y1 = m(x - x1)
-    # We can solve for m as follows:
-    m = (y2 - y1) / ((x2 - x1)+1e-30)
-
-    # The equation of the line can then be written as:
-    #   y = mx - mx1 + y1
-    # We can solve for b as follows:
-    b = y1 - m * x1
-
-    # The distance between a point (x0, y0) and a line y = mx + b is given by:
-    #   distance = abs(y0 - mx0 - b) / sqrt(m**2 + 1)
-    distance = abs(cy - m * cx - b) / np.sqrt(m**2 + 1)
-
-    # If the distance is greater than the radius of the circle, the line segment and the circle do not intersect
-    if distance > radius:
-        return False
-    else:
-        # If the distance is less than the radius, we need to check if one of the endpoints of the line segment is inside the circle
-        d1 = np.sqrt((cx - x1)**2 + (cy - y1)**2)
-        d2 = np.sqrt((cx - x2)**2 + (cy - y2)**2)
-        return d1 <= radius or d2 <= radius
 
 
 ## Rendering utilities
@@ -179,18 +150,18 @@ def clear_screen():
     ctx_histogram.fillRect(0, 0, 1, 1)
 
 
-def draw_Gaussian(id, param, color, color2):
+def draw_Gaussian(id, gaussians, color, color2):
     ctx.setTransform(canvas.width, 0, 0, -canvas.height, 0, canvas.height)
-    ctx.translate(param.Mu[0,id], param.Mu[1,id])
+    ctx.translate(gaussians.Mu[0,id], gaussians.Mu[1,id])
 
-    s, U = np.linalg.eig(param.Sigma[:2, :2, id])
+    s, U = np.linalg.eig(gaussians.Sigma[:2, :2, id])
 
     # Draw Gaussian
     al = np.linspace(-np.pi, np.pi, 50)
     D = np.diag(s) * 2 # Draw contours with two standard deviations
     R = np.real(U @ np.sqrt(D+0j))
 
-    msh = (R @ np.array([np.cos(al), np.sin(al)])).T #+ param.Mu[:2,id]
+    msh = (R @ np.array([np.cos(al), np.sin(al)])).T
 
     ctx.lineWidth = 0.005
     ctx.fillStyle = color
@@ -235,7 +206,7 @@ def draw_scene(param):
 
     # Draw Gaussians
     for k in range(param.nbGaussian):
-        draw_Gaussian(k, param, '#FFA50066', '#FFA500')
+        draw_Gaussian(k, gaussians, '#FFA50066', '#FFA500')
 
     # Draw initial points
     ctx.setTransform(canvas.width, 0, 0, -canvas.height, 0, canvas.height)
@@ -261,13 +232,5 @@ def draw_scene(param):
     # Draw the controls allowing to manipulate the gaussians
     draw_Gaussian_controls(controls, '#AA1166', '#FFFF00')
 
-    # Draw histogram
-    ctx_histogram.setTransform(canvas_histogram.width, 0, 0, -canvas_histogram.height, 0, canvas_histogram.height)
-    if hist is not None:
-        normalized = hist.copy() / np.sum(hist)
-        normalized = normalized / np.max(normalized)
-        for ky in range(hist.shape[0]):
-            for kx in range(hist.shape[1]):
-                color = (1.0 - normalized[ky, kx]) * 255
-                ctx_histogram.fillStyle = f'rgb({color}, {color}, {color})'
-                ctx_histogram.fillRect(xbins[kx], ybins[ky], xbins[kx+1] - xbins[kx], ybins[ky+1] - ybins[ky])
+    # Draw histograms (if applicable)
+    draw_histograms()

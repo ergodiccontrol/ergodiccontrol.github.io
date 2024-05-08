@@ -83,8 +83,8 @@
             <div class="col-sm-5">
                 <div class="sticky-sm-top" style="padding: 2rem 1rem 1rem 1rem;">
                     <canvas id="canvas" style="width:100%;" width="900px" height="900px"></canvas>
-                    <canvas id="canvas_histogram" style="width:100%;" width="900px" height="900px"></canvas>
-                    <div id="legend" style="margin-top: 40px; font-size: 70%; color: #777777;"></div>
+                    <canvas id="canvas_histogram" style="width:100%;" width="900px" height="450px"></canvas>
+                    <div id="legend" style="margin-top: 0px; font-size: 70%; color: #777777;"></div>
                 </div>
             </div> <!--sm-5-->
         </div> <!--row-->
@@ -102,6 +102,7 @@
 <py-script>
 from js import document
 import asyncio
+from pyodide.ffi import create_proxy
 
 
 # The configuration of each tab
@@ -114,7 +115,7 @@ config = {
         },
         'texts': {
             'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_1d.py" target="#">this script</a>',
-            'legend': 'Top: the gaussians defined in <code>initialState()</code><br>Middle: the trajectory, both in 1D (in black) and over time (in gray)<br>Bottom: histogram of the trajectory',
+            'legend': '<br>Top: the gaussians defined in <code>initialState()</code><br>Middle: the trajectory, both in 1D (in black) and over time (in gray)<br>Bottom: <code>w_hat</code> (colored) and <code>w</code> (grayscale)',
         },
     },
     'SMC2D-tab': {
@@ -126,7 +127,7 @@ config = {
         },
         'texts': {
             'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/smc_2d.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
-            'legend': '',
+            'legend': '<span style="text-align:center; width: 50%; display: inline-block"><code>w_hat</code></span><span style="text-align:center; width: 50%; display: inline-block"><code>w</code></span>',
         },
         'has_histogram': True,
     },
@@ -141,7 +142,6 @@ config = {
             'help': 'If you need context about how this code is used, see <a href="scripts/sandbox/hedac.py" target="#">this script</a> and <a href="scripts/sandbox/common.py" target="#">this one</a>',
             'legend': '',
         },
-        'has_histogram': True,
     }
 }
 
@@ -211,15 +211,22 @@ def switch_to_tab(id):
 
     exec(user_code, globals())
 
+    reset()
+
 
 terminal = document.getElementsByClassName('py-terminal-docked')
 if terminal.length == 1:
     terminal[0].remove()
 
+
 switch_to_tab('SMC1D-tab')
 
 
 async def main():
+    run_buttons = document.getElementsByClassName("py-repl-run-button")
+    for button in run_buttons:
+        button.addEventListener('click', create_proxy(lambda evt: reset()))
+
     while True:
         # Call the appropriate update function
         update()

@@ -15,7 +15,7 @@ param.nbAgents = 2
 param.diffusion = 1  # increases global behavior
 param.source_strength = 1    # increases local behavior
 param.max_dx = 1 # maximum velocity of the agent
-param.max_ddx = 0.1 # maximum acceleration of the agent
+param.max_ddx = 0.5 # maximum acceleration of the agent
 param.dx = 1
 param.nbRes = 100   # resolution of discretization
 param.min_kernel_val = 1e-8  # upper bound on the minimum value of the kernel
@@ -244,7 +244,7 @@ def calculate_gradient(agent, gradient_x, gradient_y):
     # if kernel around the agent is outside the grid,
     # use the gradient to direct the agent inside the grid
     boundary_gradient = 2  # 0.1
-    pad = param.kernel_size - 1
+    pad = 0 #param.kernel_size - 1
     if row <= pad:
         gradient[1] = boundary_gradient
     elif row >= param.height - 1 - pad:

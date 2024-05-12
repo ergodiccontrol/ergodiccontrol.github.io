@@ -3,8 +3,11 @@ param.x0 = np.array([
     [.2, .3],
 ])
 
-# Number of gaussians
+# Number of Gaussians
 param.nbGaussian = 2
+
+# Timesteps for integrating diffusion (higher values lead to more global exploration, [1,100])
+param.nb_diffusion_timesteps = 100  
 
 
 def controlCommand(agents, goal_density, coverage_density, heat, coverage_block, param):
@@ -39,17 +42,16 @@ def controlCommand(agents, goal_density, coverage_density, heat, coverage_block,
     source = np.maximum(diff, 0) ** 2
     source = normalize_mat(source) * param.area
 
-    current_heat = np.zeros((param.height, param.width))
-
     # 2-D heat equation (Partial Differential Equation)
     # In 2-D we perform this second-order central for x and y.
     # Note that, delta_x = delta_y = h since we have a uniform grid.
     # Accordingly we have -4.0 of the center element.
-
+    
     # At boundary we have Neumann boundary conditions which assumes
     # that the derivative is zero at the boundary. This is equivalent
     # to having a zero flux boundary condition or perfect insulation.
-    current_heat[1:-1, 1:-1] = param.dt * (
+    for i in range(param.nb_diffusion_timesteps):
+      heat[1:-1, 1:-1] = param.dt * (
         (
             + param.alpha[0] * offset(heat, 1, 0)
             + param.alpha[0] * offset(heat, -1, 0)
@@ -60,9 +62,7 @@ def controlCommand(agents, goal_density, coverage_density, heat, coverage_block,
         / (param.dx * param.dx)
         + param.source_strength * offset(source, 0, 0)
     ) + offset(heat, 0, 0)
-
-    heat = current_heat.astype(np.float32)
-
+    
     # Calculate the first derivatives mind the order x and y
     gradient_y, gradient_x = np.gradient(heat, 1, 1)
 

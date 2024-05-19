@@ -1,9 +1,5 @@
 html {
-  font-size: 1vw;
-}
-
-section {
-	padding: 4vw 0;
+	max-width: 3840px;
 }
 
 body {
@@ -11,12 +7,22 @@ body {
 	text-align: justify;
 }
 
+section {
+	padding: 4rem 0;
+}
+
 h2 {
 	font-family: 'Nixie One', sans-serif;
     font-weight: bold;
     font-style: normal;
-	font-size: 2vw;
-	padding: 0 0 2vw 0;
+    font-size: 2rem;
+	padding: 0 0 2rem 0;
+}
+
+@media all and (max-width: 1200px) {
+	h2 {
+		font-size: 1.2rem;
+	}
 }
 
 a { 
@@ -27,6 +33,7 @@ a {
 a:hover { 
 	color: #29BF12; 
 } 
+
 
 /*
 https://coolors.co/29bf12-abff4f-08bdbd-f21b3f-ff9914
@@ -65,7 +72,7 @@ https://coolors.co/29bf12-abff4f-08bdbd-f21b3f-ff9914
 
 .mybg-schedule {
 	font-family: 'Roboto Mono', sans-serif;
-	font-size: .8vw;
+	font-size: .8rem;
 }
 
 .mybg-footer {
